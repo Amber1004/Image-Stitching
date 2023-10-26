@@ -44,6 +44,35 @@ class Brief:
             bit_str += "1" if flatten_rectangle[pair[0]] < flatten_rectangle[pair[1]] else "0"
         return int(bit_str, base=2)
 
+    @staticmethod
+    def __hamming_dist(descriptor_1, descriptor_2):
+        """
+        compute the hamming distance between all pairs of key points
+        :param descriptor_1: 128-bits or 256-bits binary int
+        :param descriptor_2: 128-bits or 256-bits  binary int
+        :return: hamming distance (int)
+        """
+        xor = descriptor_1 ^ descriptor_2
+        return bin(xor).count("1")
+
+    def get_threshold_pairs(self, descriptors_1, descriptors_2, location_1, location_2, threshold):
+        """
+        This function compute the hamming distance between all key points pairs, and return only pairs with hamming distance less than threshold
+        :param descriptors_1: list of binary int
+        :param descriptors_2: list of binary int
+        :param location_1: np.array()
+        :param location_2: np.array()
+        :param threshold: less is better
+        :return: list of tuples of location
+        """
+        diff = np.zeros(shape=(len(descriptors_1), len(descriptors_2)))
+        for row in range(len(descriptors_1)):
+            for col in range(len(descriptors_2)):
+                diff[row][col] = self.__hamming_dist(descriptors_1[row], descriptors_2(col))
+        diff = diff < threshold
+        a, b = np.nonzero(diff)
+        return [(location_1[i], location_2[j]) for i, j in zip(a, b)]
+
     def compute(self, image, keypoints):
         """
         BRIEF detector converts the given keypoints into 128 or 256 bit encoding
@@ -51,10 +80,10 @@ class Brief:
         :param keypoints: an array of keypoint positions
         :return: descriptor, keypoint position
         """
-        descriptor = []
+        descriptors = []
         for keypoint in keypoints:
-            descriptor.append(self.__describe(image, keypoint[0], keypoint[1]))
-        return descriptor, keypoints
+            descriptors.append(self.__describe(image, keypoint[0], keypoint[1]))
+        return descriptors, keypoints
 
 
 
