@@ -16,7 +16,10 @@ if __name__ == "__main__":
     img2 = cv2.cvtColor(image2, cv2.COLOR_BGR2RGB)
     img2 = cv2.cvtColor(img2, cv2.COLOR_RGB2GRAY)
     #ORB
-    orb(img, img2, brief_kernel_size=25, bit_length=128, threshold=10)
+    pairs = orb(img, img2, brief_kernel_size=25, bit_length=128, threshold=10)
+
+    # Homography
+    homography = ransac(pairs, number_iteration=2000, threshold=3)
     # image_cp = np.copy(img_gray)
     # image2_cp = np.copy(img2)
     # keypoints = FeaturesAcceleratedSegmentTest(img_gray)
