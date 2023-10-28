@@ -64,17 +64,20 @@ def error_distance(des, homo_des):
     return error
     
 def ransac(pairs, number_iteration=2000, threshold=3):
+    """
+        Homography calculation
+        :param pairs: matching points between image 1 and image 2
+        :param number_iteration: number of iteration for RANSAC algorithm
+        :param threshold: threshold for counting the inliers 
+        :return: 3x3 homography matrix
+    """
 
-    pairs = np.array(pairs, dtype = object)
     src_pts = []
     des_pts = []
-    for i in pairs:
-        src_pts.append(i[0])
-        des_pts.append(i[1])
-    src_pts = np.array(src_pts)
-    des_pts = np.array(des_pts)
-    src_pts = [tuple(arr[0]) for arr in src_pts]
-    des_pts = [tuple(arr[0]) for arr in des_pts]
+    for p in pairs:
+        src_pts.append(p[0])
+        des_pts.append(p[1])
+        
     most_inliers_count = 0
     best_inliers = None
     best_H = None
