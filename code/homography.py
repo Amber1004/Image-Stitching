@@ -4,9 +4,17 @@ import math
 
 # Get random pairs of matching points
 def random_pairs(src_pts, des_pts, n=4):
+
+    src_random = []
+    des_random = []
+
     index = np.random.choice(len(src_pts), n, replace=False)
-    src_random = src_pts[index]
-    des_random = des_pts[index]
+    index_list = index.tolist()
+    for i in range (len(index_list)):
+        pts_index = index_list[i]
+        src_random.append(tuple(src_pts[pts_index]))
+        des_random.append(tuple(des_pts[pts_index]))
+    
     return src_random, des_random
 
 # Calculate homography
@@ -36,7 +44,8 @@ def calc_homography(src, des):
 # Apply homography on the source point to get the estimated destination point
 def apply_homography(src, H):
     src_arr = np.array(src)
-    src_3d = np.ones(len(src_arr))
+    src_arr = src_arr.reshape(-1, src_arr.shape[-1])
+    src_3d = np.ones((len(src_arr)))
     src_homogenous = np.column_stack((src_arr,src_3d))
     homography_point = np.dot(src_homogenous,H.T)
     src_homo_pts = homography_point[:,:2]/homography_point[:,2,np.newaxis]
@@ -54,17 +63,9 @@ def error_distance(des, homo_des):
     
     return error
     
-def ransac(pairs, number_iteration=2000, threshold=5):
+def ransac(pairs, number_iteration=2000, threshold=3):
 
-    """
-        Homography calculation
-        :param pairs: matching points between image 1 and image 2
-        :param number_iteration: number of iteration for RANSAC algorithm
-        :param threshold: threshold for counting the inliers 
-        :return: 3x3 homography matrix
-    """
-
-    pairs = np.array(pairs)
+    pairs = np.array(pairs, dtype = object)
     src_pts = []
     des_pts = []
     for i in pairs:
@@ -72,7 +73,8 @@ def ransac(pairs, number_iteration=2000, threshold=5):
         des_pts.append(i[1])
     src_pts = np.array(src_pts)
     des_pts = np.array(des_pts)
-
+    src_pts = [tuple(arr[0]) for arr in src_pts]
+    des_pts = [tuple(arr[0]) for arr in des_pts]
     most_inliers_count = 0
     best_inliers = None
     best_H = None
@@ -98,9 +100,8 @@ def ransac(pairs, number_iteration=2000, threshold=5):
         if inliers_count > most_inliers_count:
             best_H = H
             most_inliers_count = inliers_count
-            print(most_inliers_count)
             best_inliers = inliers
-
+            
 # Recompute the homography using all the inliers in the best model
     src_inliers = []
     des_inliers = []
