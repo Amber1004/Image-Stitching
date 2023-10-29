@@ -33,6 +33,8 @@ def image_warping(dst, src, h):
     :param h: The homographic matrix
     :return: A merged image
     """
+    decay_factor = 0.05
+    decay_pow_factor = 6
     src_min_x, src_max_x, src_min_y, src_max_y = 0, src.shape[0], 0, src.shape[1]
     min_x, max_x, min_y, max_y = get_boundary(src, h)
     dst_max_x, dst_max_y, dst_min_x, dst_min_y = dst.shape[0], dst.shape[1], 0, 0
@@ -46,26 +48,29 @@ def image_warping(dst, src, h):
             target = np.dot(translation, arr([row, col, 1]))
             pixel_position = np.dot(inv_h, arr([row, col, 1]))
             x, y = pixel_position[0]/pixel_position[2], pixel_position[1]/pixel_position[2]
-            try:
-                res[target[0], target[1], :] = src[x, y, :]
-            except IndexError:
-                if 0 <= x < src_max_x and 0 <= y < src_max_y:
-                    # Interpolate without weight
-                    x1 = max(math.floor(x), src_min_x)
-                    x2 = min(math.ceil(x), src_max_x-1)
-                    y1 = max(math.floor(y), src_min_y)
-                    y2 = min(math.ceil(y), src_max_y-1)
-                    # temp = src[x1, y1, :] + src[x1, y2, :] + src[x2, y1, :] + src[x2, y2, :]
-                    # res[target[0], target[1], :] = temp//4
-                    res[target[0], target[1], :] = src[x2, y2, :]
+            # try:
+            #     res[target[0], target[1], :] = src[x, y, :]
+            # except IndexError:
+            if 0 <= x < src_max_x and 0 <= y < src_max_y:
+                # Interpolate without weight
+                # x1 = max(math.floor(x), src_min_x)
+                x2 = min(math.ceil(x), src_max_x-1)
+                # y1 = max(math.floor(y), src_min_y)
+                y2 = min(math.ceil(y), src_max_y-1)
+                # temp = src[x1, y1, :] + src[x1, y2, :] + src[x2, y1, :] + src[x2, y2, :]
+                # res[target[0], target[1], :] = temp//4
+                res[target[0], target[1]] = src[x2, y2] * (1-(decay_factor*(abs(x-src_max_x//2)/(src_max_x//2))**(decay_pow_factor)))*(1-(decay_factor*(abs(y-src_max_y//2)/(src_max_y//2))**(decay_pow_factor)))
+            else:
+                continue
+
     for row in range(dst_min_x, dst_max_x):
         for col in range(dst_min_y, dst_max_y):
             target = np.dot(translation, arr([row, col, 1]))
-            temp = dst[row, col, :]
+            temp = dst[row, col]
             if res[target[0], target[1], 0] != 0 or res[target[0], target[1], 1] != 0 or res[target[0], target[1], 2] != 0:
-                temp = res[target[0], target[1], :] + temp
+                temp = res[target[0], target[1]] + temp
                 temp //= 2
-            res[target[0], target[1], :] = temp
+            res[target[0], target[1]] = temp * (1-(decay_factor*(abs(row-dst_max_x//2)/(dst_max_x//2))**decay_pow_factor))*(1-(decay_factor*(abs(col-dst_max_y//2)/(dst_max_y//2))**decay_pow_factor))
     return res
 
 
