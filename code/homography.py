@@ -108,7 +108,7 @@ def ransac(pairs, number_iteration=2000, threshold=3):
 # Recompute the homography using all the inliers in the best model
     src_inliers = []
     des_inliers = []
-    for i in range(len(best_inliers)):
+    for i in range(best_inliers):
         src_inliers.append(src_pts[i])
         des_inliers.append(des_pts[i])
 
