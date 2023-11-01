@@ -9,8 +9,8 @@ from image_warpping import image_warping
 
 if __name__ == "__main__":
     # Load the image
-    image1 = cv2.imread('./image_pairs/image_pairs_03_01.jpg')
-    image2 = cv2.imread('./image_pairs/image_pairs_03_02.jpg')
+    image1 = cv2.imread('./../image_pairs/image_pairs_03_01.jpg')
+    image2 = cv2.imread('./../image_pairs/image_pairs_03_02.jpg')
     # Convert  image to RGB
     img = cv2.cvtColor(image1, cv2.COLOR_BGR2RGB)
     img2 = cv2.cvtColor(image2, cv2.COLOR_BGR2RGB)

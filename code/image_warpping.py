@@ -70,7 +70,10 @@ def image_warping(dst, src, h):
             if res[target[0], target[1], 0] != 0 or res[target[0], target[1], 1] != 0 or res[target[0], target[1], 2] != 0:
                 temp = res[target[0], target[1]] + temp
                 temp //= 2
-            res[target[0], target[1]] = temp * (1-(decay_factor*(abs(row-dst_max_x//2)/(dst_max_x//2))**decay_pow_factor))*(1-(decay_factor*(abs(col-dst_max_y//2)/(dst_max_y//2))**decay_pow_factor))
+                res[target[0], target[1]] = (temp+res[target[0], target[1]])//2#*(decay_factor) + res[target[0], target[1], 0]*(decay_factor)#temp * (1-(decay_factor*(abs(row-dst_max_x//2)/(dst_max_x//2))**decay_pow_factor))*(1-(decay_factor*(abs(col-dst_max_y//2)/(dst_max_y//2))**decay_pow_factor))
+            else:
+                res[target[0], target[1]] = temp * (1-(decay_factor*(abs(row-dst_max_x//2)/(dst_max_x//2))**decay_pow_factor))*(1-(decay_factor*(abs(col-dst_max_y//2)/(dst_max_y//2))**decay_pow_factor))
+            #res[target[0], target[1]] = temp * (1-(decay_factor*(abs(row-dst_max_x//2)/(dst_max_x//2))**decay_pow_factor))*(1-(decay_factor*(abs(col-dst_max_y//2)/(dst_max_y//2))**decay_pow_factor))
     return res
 
 
