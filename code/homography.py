@@ -114,4 +114,4 @@ def ransac(pairs, number_iteration=2000, threshold=3):
 
     best_H = calc_homography(src_inliers,des_inliers)
 
-    return best_H
+    return best_H, src_inliers, des_inliers
